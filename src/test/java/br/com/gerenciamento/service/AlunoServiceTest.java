@@ -10,6 +10,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.TransactionSystemException;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -43,5 +46,60 @@ public class AlunoServiceTest {
         aluno.setMatricula("123456");
         Assert.assertThrows(ConstraintViolationException.class, () -> {
                 this.serviceAluno.save(aluno);});
+    }
+
+
+    @Test
+    public void salvarSemMatricula() {
+        Aluno aluno = new Aluno();
+        aluno.setId(1L);
+        aluno.setNome("Vinicius");
+        aluno.setTurno(Turno.NOTURNO);
+        aluno.setCurso(Curso.ADMINISTRACAO);
+        aluno.setStatus(Status.ATIVO);
+        Assert.assertThrows(TransactionSystemException.class, () -> {
+            this.serviceAluno.save(aluno);
+        });
+    }
+
+    @Test
+    public void salvarSemCurso() {
+        Aluno aluno = new Aluno();
+        aluno.setId(1L);
+        aluno.setNome("Vinicius");
+        aluno.setTurno(Turno.NOTURNO);
+        aluno.setStatus(Status.ATIVO);
+        aluno.setMatricula("123456");
+        Assert.assertThrows(ConstraintViolationException.class, () -> {
+            this.serviceAluno.save(aluno);
+        });
+    }
+    
+    @Test
+    public void salvarSemTurno() {
+        Aluno aluno = new Aluno();
+        aluno.setId(1L);
+        aluno.setNome("Vinicius");
+        aluno.setCurso(Curso.ADMINISTRACAO);
+        aluno.setStatus(Status.ATIVO);
+        aluno.setMatricula("123456");
+        Assert.assertThrows(ConstraintViolationException.class, () -> {
+            this.serviceAluno.save(aluno);
+        });
+    }
+
+    @Test
+    public void getByName() {
+        Aluno aluno = new Aluno();
+        aluno.setId(1L);
+        aluno.setNome("Vinicius");
+        aluno.setTurno(Turno.NOTURNO);
+        aluno.setCurso(Curso.ADMINISTRACAO);
+        aluno.setStatus(Status.ATIVO);
+        aluno.setMatricula("123456");
+        this.serviceAluno.save(aluno);
+
+        List<Aluno> alunos = this.serviceAluno.findByNomeContainingIgnoreCase("ViNiCiUs");
+        Assert.assertTrue(alunos.get(0).getNome().equals("Vinicius"));
     }
 }
